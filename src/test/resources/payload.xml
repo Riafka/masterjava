@@ -2,22 +2,90 @@
          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://javaops.ru payload.xsd">
     <Users>
-        <User flag="active" city="kiv">
-            <email>gmail@gmail.com</email>
+        <User flag="active" city="kiv" email="gmail@gmail.com">
             <fullName>Full Name</fullName>
+            <Projects>
+                <Project project="masterjava">
+                    <Groups groups="masterjava01"/>
+                </Project>
+            </Projects>
         </User>
-        <User flag="superuser" city="spb">
-            <email>admin@javaops.ru</email>
+        <User flag="active" city="prm" email="riafka@gmail.com">
+            <fullName>Боровиков Роман</fullName>
+            <Projects>
+                <Project project="masterjava">
+                    <Groups groups="masterjava01"/>
+                </Project>
+                <Project project="topjava">
+                    <Groups groups="topjava07"/>
+                </Project>
+            </Projects>
+        </User>
+        <User flag="active" city="msk" email="noemail@gmail.com">
+            <fullName>Тестовый Василий</fullName>
+            <Projects>
+                <Project project="topjava">
+                    <Groups groups="topjava08"/>
+                </Project>
+            </Projects>
+        </User>
+        <User flag="superuser" city="spb" email="admin@javaops.ru">
             <fullName>Admin</fullName>
+            <Projects>
+                <Project project="topjava">
+                    <Groups groups="topjava07 topjava08"/>
+                </Project>
+                <Project project="masterjava">
+                    <Groups groups="masterjava01"/>
+                </Project>
+            </Projects>
         </User>
-        <User flag="deleted" city="spb">
-            <email>mail@yandex.ru</email>
+        <User flag="deleted" city="spb" email="mail@yandex.ru">
             <fullName>Deleted</fullName>
+            <Projects>
+                <Project project="topJava2"/>
+            </Projects>
         </User>
     </Users>
     <Cities>
         <City id="spb">Санкт-Петербург</City>
         <City id="kiv">Киев</City>
         <City id="mnsk">Минск</City>
+        <City id="prm">Пермь</City>
+        <City id="msk">Москва</City>
     </Cities>
+    <Projects>
+        <Project id="topjava">
+            <name>topjava</name>
+            <description>Курс topjava</description>
+            <Groups>
+                <Group id="topjava07">
+                    <name>topjava07</name>
+                    <type>FINISHED</type>
+                </Group>
+                <Group id="topjava08">
+                    <name>topjava08</name>
+                    <type>CURRENT</type>
+                </Group>
+                <Group id="topjava09">
+                    <name>topjava09</name>
+                    <type>REGISTERING</type>
+                </Group>
+            </Groups>
+        </Project>
+        <Project id="masterjava">
+            <name>masterjava</name>
+            <description>Курс masterjava</description>
+            <Groups>
+                <Group id="masterjava01">
+                    <name>masterjava01</name>
+                    <type>CURRENT</type>
+                </Group>
+            </Groups>
+        </Project>
+        <Project id="topJava2">
+            <name>topjava2</name>
+            <description>Курс topJava2</description>
+        </Project>
+    </Projects>
 </Payload>

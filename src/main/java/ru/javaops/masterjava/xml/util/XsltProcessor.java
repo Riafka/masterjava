@@ -19,7 +19,7 @@ public class XsltProcessor {
             Templates template = FACTORY.newTemplates(new StreamSource(xslReader));
             xformer = template.newTransformer();
         } catch (TransformerConfigurationException e) {
-            throw new IllegalStateException("XSLT transformer creation failed: " + e.toString(), e);
+            throw new IllegalStateException("XSLT transformer creation failed: " + e, e);
         }
     }
 
@@ -39,5 +39,9 @@ public class XsltProcessor {
 
     public static String getXsltHeader(String xslt) {
         return "<?xml-stylesheet type=\"text/xsl\" href=\"" + xslt + "\"?>\n";
+    }
+
+    public void setParameter(String parameterName, String parameterValue) {
+        xformer.setParameter(parameterName, parameterValue);
     }
 }
