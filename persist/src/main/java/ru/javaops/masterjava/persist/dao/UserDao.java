@@ -2,9 +2,11 @@ package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
 import org.skife.jdbi.v2.sqlobject.*;
+import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
 import ru.javaops.masterjava.persist.model.User;
 
+import java.util.Iterator;
 import java.util.List;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
@@ -27,6 +29,10 @@ public abstract class UserDao implements AbstractDao {
     @SqlUpdate("INSERT INTO users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag)) ")
     abstract void insertWitId(@BindBean User user);
 
+    @SqlBatch("insert into users (id, full_name, email, flag) VALUES (:id, :fullName, :email, CAST(:flag AS user_flag))" +
+            " ON CONFLICT ON CONSTRAINT unique_email DO NOTHING;")
+    abstract void insertBatch(@BindBean Iterator<User> userIterator, @BatchChunkSize int batchChunkSize);
+
     @SqlQuery("SELECT * FROM users ORDER BY full_name, email LIMIT :it")
     public abstract List<User> getWithLimit(@Bind int limit);
 
@@ -34,4 +40,21 @@ public abstract class UserDao implements AbstractDao {
     @SqlUpdate("TRUNCATE users")
     @Override
     public abstract void clean();
+
+    @SqlQuery("SELECT last_value FROM user_seq")
+    public abstract int getUserSeq();
+
+    @SqlUpdate("SELECT setval('user_seq', :it, true);")
+    public abstract void setUserSeq(@Bind int value);
+
+    public void insertBatch(List<User> users, int batchChunkSize) {
+        int currUserSeq = getUserSeq() + 1;
+        for (User user : users) {
+            user.setId(currUserSeq);
+            currUserSeq++;
+        }
+        insertBatch(users.iterator(), batchChunkSize);
+
+        setUserSeq(currUserSeq);
+    }
 }
