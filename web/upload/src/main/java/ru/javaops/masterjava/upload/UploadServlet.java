@@ -4,7 +4,6 @@ import com.google.common.collect.ImmutableMap;
 import lombok.extern.slf4j.Slf4j;
 import org.thymeleaf.context.WebContext;
 
-import javax.servlet.ServletException;
 import javax.servlet.annotation.MultipartConfig;
 import javax.servlet.annotation.WebServlet;
 import javax.servlet.http.HttpServlet;
@@ -25,13 +24,15 @@ public class UploadServlet extends HttpServlet {
 
     private final UserProcessor userProcessor = new UserProcessor();
 
+    private final CityProcessor cityProcessor = new CityProcessor();
+
     @Override
-    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doGet(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         out(req, resp, "", CHUNK_SIZE);
     }
 
     @Override
-    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws IOException {
         String message;
         int chunkSize = CHUNK_SIZE;
         try {
@@ -42,6 +43,7 @@ public class UploadServlet extends HttpServlet {
             } else {
                 Part filePart = req.getPart("fileToUpload");
                 try (InputStream is = filePart.getInputStream()) {
+                    cityProcessor.process(is, chunkSize);
                     List<UserProcessor.FailedEmails> failed = userProcessor.process(is, chunkSize);
                     log.info("Failed users: " + failed);
                     final WebContext webContext =
