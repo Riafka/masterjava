@@ -1,14 +1,14 @@
 package ru.javaops.masterjava.upload;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import lombok.val;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.dao.UserDao;
 import ru.javaops.masterjava.persist.model.User;
 import ru.javaops.masterjava.persist.model.UserFlag;
 import ru.javaops.masterjava.xml.schema.ObjectFactory;
 import ru.javaops.masterjava.xml.util.JaxbParser;
-import ru.javaops.masterjava.xml.util.JaxbUnmarshaller;
 import ru.javaops.masterjava.xml.util.StaxStreamProcessor;
 
 import javax.xml.bind.JAXBException;
@@ -24,29 +24,14 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
+@Slf4j
 public class UserProcessor {
-    private static final Logger log = LoggerFactory.getLogger(UserProcessor.class);
     private static final int NUMBER_THREADS = 4;
 
     private static final JaxbParser jaxbParser = new JaxbParser(ObjectFactory.class);
     private static UserDao userDao = DBIProvider.getDao(UserDao.class);
 
     private ExecutorService executorService = Executors.newFixedThreadPool(NUMBER_THREADS);
-
-    public static class FailedEmails {
-        public String emailsOrRange;
-        public String reason;
-
-        public FailedEmails(String emailsOrRange, String reason) {
-            this.emailsOrRange = emailsOrRange;
-            this.reason = reason;
-        }
-
-        @Override
-        public String toString() {
-            return emailsOrRange + " : " + reason;
-        }
-    }
 
     /*
      * return failed users chunks
@@ -58,8 +43,8 @@ public class UserProcessor {
 
         int id = userDao.getSeqAndSkip(chunkSize);
         List<User> chunk = new ArrayList<>(chunkSize);
-        final StaxStreamProcessor processor = new StaxStreamProcessor(is);
-        JaxbUnmarshaller unmarshaller = jaxbParser.createUnmarshaller();
+        val processor = new StaxStreamProcessor(is);
+        val unmarshaller = jaxbParser.createUnmarshaller();
 
         while (processor.doUntil(XMLEvent.START_ELEMENT, "User")) {
             ru.javaops.masterjava.xml.schema.User xmlUser = unmarshaller.unmarshal(processor.getReader(), ru.javaops.masterjava.xml.schema.User.class);
@@ -92,6 +77,17 @@ public class UserProcessor {
             failed.add(new FailedEmails(allAlreadyPresents.toString(), "already presents"));
         }
         return failed;
+    }
+
+    @AllArgsConstructor
+    public static class FailedEmails {
+        public String emailsOrRange;
+        public String reason;
+
+        @Override
+        public String toString() {
+            return emailsOrRange + " : " + reason;
+        }
     }
 
     private void addChunkFutures(Map<String, Future<List<String>>> chunkFutures, List<User> chunk) {
