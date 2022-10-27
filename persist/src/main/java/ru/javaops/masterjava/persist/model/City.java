@@ -13,4 +13,9 @@ public class City extends BaseEntity {
 
     @Column("full_name")
     private @NonNull String fullName;
+
+    public City(Integer id, String shortName, String fullName) {
+        this(shortName, fullName);
+        this.id = id;
+    }
 }

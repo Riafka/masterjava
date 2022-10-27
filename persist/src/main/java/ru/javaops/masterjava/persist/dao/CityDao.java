@@ -2,10 +2,7 @@ package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
 import one.util.streamex.IntStreamEx;
-import org.skife.jdbi.v2.sqlobject.BindBean;
-import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
-import org.skife.jdbi.v2.sqlobject.SqlBatch;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
 import ru.javaops.masterjava.persist.model.City;
@@ -25,7 +22,7 @@ public abstract class CityDao implements AbstractDao {
         return city;
     }
 
-    @SqlUpdate("TRUNCATE cities")
+    @SqlUpdate("TRUNCATE cities CASCADE")
     @Override
     public abstract void clean();
 
@@ -39,6 +36,9 @@ public abstract class CityDao implements AbstractDao {
     @SqlBatch("INSERT INTO cities (short_name,full_name) VALUES (:shortName, :fullName)" +
             "ON CONFLICT DO NOTHING")
     public abstract int[] insertBatch(@BindBean List<City> users, @BatchChunkSize int chunkSize);
+
+    @SqlQuery("SELECT * FROM cities ORDER BY short_name")
+    public abstract List<City> findAll();
 
     public List<String> insertAndGetLogs(List<City> cities) {
         int[] result = insertBatch(cities, cities.size());

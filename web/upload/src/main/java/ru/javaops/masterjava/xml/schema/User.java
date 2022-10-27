@@ -40,9 +40,7 @@ public class User {
     @XmlAttribute(name = "flag", required = true)
     protected FlagType flag;
     @XmlAttribute(name = "city", required = true)
-    @XmlIDREF
-    @XmlSchemaType(name = "IDREF")
-    protected Object city;
+    protected String city;
     @XmlAttribute(name = "groupRefs")
     @XmlIDREF
     @XmlSchemaType(name = "IDREFS")
@@ -122,25 +120,21 @@ public class User {
 
     /**
      * Gets the value of the city property.
-     * 
-     * @return
-     *     possible object is
-     *     {@link Object }
-     *     
+     *
+     * @return possible object is
+     * {@link Object }
      */
-    public Object getCity() {
+    public String getCity() {
         return city;
     }
 
     /**
      * Sets the value of the city property.
-     * 
-     * @param value
-     *     allowed object is
-     *     {@link Object }
-     *     
+     *
+     * @param value allowed object is
+     *              {@link Object }
      */
-    public void setCity(Object value) {
+    public void setCity(String value) {
         this.city = value;
     }
 

@@ -15,10 +15,10 @@ public class CityTestData {
     public static List<City> cities;
 
     public static void init() {
-        moscow = new City("msk", "Москва");
-        spb = new City("spb", "Санкт-Петербург");
-        kiev = new City("kiev", "Киев");
-        minsk = new City("mnsk", "Минск");
+        moscow = new City(1, "msk", "Москва");
+        spb = new City(2, "spb", "Санкт-Петербург");
+        kiev = new City(3, "kiev", "Киев");
+        minsk = new City(4, "mnsk", "Минск");
         cities = ImmutableList.of(moscow, spb, kiev, minsk);
     }
 
