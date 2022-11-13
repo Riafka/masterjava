@@ -13,4 +13,10 @@ public class Project extends BaseEntity {
     private String name;
     @NonNull
     private String description;
+
+    public Project(Integer id, @NonNull String name, @NonNull String description) {
+        super(id);
+        this.name = name;
+        this.description = description;
+    }
 }

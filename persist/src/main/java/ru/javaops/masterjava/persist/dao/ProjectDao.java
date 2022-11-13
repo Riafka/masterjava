@@ -2,13 +2,12 @@ package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
 import one.util.streamex.StreamEx;
-import org.skife.jdbi.v2.sqlobject.BindBean;
-import org.skife.jdbi.v2.sqlobject.GetGeneratedKeys;
-import org.skife.jdbi.v2.sqlobject.SqlQuery;
-import org.skife.jdbi.v2.sqlobject.SqlUpdate;
+import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
+import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.model.Project;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 
@@ -29,6 +28,20 @@ public abstract class ProjectDao implements AbstractDao {
     @SqlUpdate("INSERT INTO project (name, description)  VALUES (:name, :description)")
     @GetGeneratedKeys
     public abstract int insertGeneratedId(@BindBean Project project);
+
+    @SqlBatch("INSERT INTO project (id,name, description)  VALUES (:id,:name, :description)")
+    public abstract void insertBatch(@BindBean Collection<Project> projects);
+
+    @SqlQuery("SELECT nextval('common_seq')")
+    abstract int getNextVal();
+
+    @Transaction
+    public int getSeqAndSkip(int step) {
+        int id = getNextVal();
+        DBIProvider.getDBI().useHandle(h -> h.execute("SELECT setval('common_seq', " + (id + step - 1) + ")"));
+        return id;
+    }
+
 
     public void insert(Project project) {
         int id = insertGeneratedId(project);

@@ -1,17 +1,21 @@
 package ru.javaops.masterjava.persist.dao;
 
 import com.bertoncelj.jdbi.entitymapper.EntityMapperFactory;
+import lombok.val;
 import one.util.streamex.IntStreamEx;
 import org.skife.jdbi.v2.sqlobject.*;
 import org.skife.jdbi.v2.sqlobject.customizers.BatchChunkSize;
 import org.skife.jdbi.v2.sqlobject.customizers.RegisterMapperFactory;
 import ru.javaops.masterjava.persist.DBIProvider;
 import ru.javaops.masterjava.persist.model.User;
+import ru.javaops.masterjava.persist.model.UserGroup;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RegisterMapperFactory(EntityMapperFactory.class)
 public abstract class UserDao implements AbstractDao {
+    private static final UserGroupDao userGroupDao = DBIProvider.getDao(UserGroupDao.class);
 
     public User insert(User user) {
         if (user.isNew()) {
@@ -55,8 +59,17 @@ public abstract class UserDao implements AbstractDao {
     public abstract int[] insertBatch(@BindBean List<User> users, @BatchChunkSize int chunkSize);
 
 
-    public List<String> insertAndGetConflictEmails(List<User> users) {
+    public List<String> insertAndGetConflictEmails(List<User> users, List<UserGroup> userGroups) {
         int[] result = insertBatch(users, users.size());
+        val userIdsInserted = IntStreamEx.range(0, users.size())
+                .filter(i -> result[i] == 1)
+                .mapToObj(index -> users.get(index).getId())
+                .collect(Collectors.toSet());
+        userGroupDao.insertBatch(
+                userGroups.stream()
+                        .filter(userGroup -> userIdsInserted.contains(userGroup.getUserId()))
+                        .collect(Collectors.toList()));
+
         return IntStreamEx.range(0, users.size())
                 .filter(i -> result[i] == 0)
                 .mapToObj(index -> users.get(index).getEmail())
